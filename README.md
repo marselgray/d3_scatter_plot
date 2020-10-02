@@ -1,1 +1,1 @@
-# d3_scatter_plot
+# D3JS Scatter Plot
