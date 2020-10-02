@@ -17,3 +17,55 @@ var svg = d3.select('#data_chart')
 	.attr('height', height + margin.top + margin.bottom)
 	.append('g')
 	.attr('transform','translate(' + margin.left + ',' + margin.top + ')');
+
+
+//Read the data
+d3.csv('https://raw.githubusercontent.com/marselgray/d3_scatter_plot/main/connectedscatter.csv',
+
+	// When reading the csv, must format variables:
+	function(d){
+		return { date : d3.timeParse('%Y-%m-%d')(d.date), value : d.value }
+	},
+
+	function(data) {
+		// Add X axis --> it is a date format
+		var x = d3.scaleTime()
+			.domain(d3.extent(data, function(d) { return d.date; }))
+			.range([ 0, width ]);
+		
+		svg.append('g')
+			.attr('transform', 'translate(0,' + height + ')')
+			.call(d3.axisBottom(x));
+		
+		// Add Y axis
+		var y = d3.scaleLinear()
+			.domain( [8000, 9200])
+			.range([ height, 0 ]);
+	
+		svg.append('g')
+			.call(d3.axisLeft(y));
+
+		// Add the line
+		svg.append('path')
+			.datum(data)
+			.attr('fill', 'none')
+			.attr('stroke', '#00008B')
+			.attr('stroke-width', 1.5)
+			.attr('d', d3.line()
+				.x(function(d) { return x(d.date) })
+				.y(function(d) { return y(d.value) })
+			)
+	
+		// Add the points
+		svg
+			.append('g')
+			.selectAll('dot')
+			.data(data)
+			.enter()
+			.append('circle')
+			.attr('cx', function(d) { return x(d.date) } )
+			.attr('cy', function(d) { return y(d.value) } )
+			.attr('r', 5)
+			.attr('fill', '#00008B')
+	}
+)
